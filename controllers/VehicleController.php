@@ -4,40 +4,44 @@ namespace Controllers;
 use Services\VehicleService;
 
 class VehicleController {
-    private $service;
+    private VehicleService $service;
 
-    public function __construct($db) {
-        $this->service = new VehicleService($db);
+    public function __construct(VehicleService $service) {
+        $this->service = $service;
     }
 
-    public function create() {
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!$data) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Données manquantes']);
-            return;
-        }
-
-        $result = $this->service->createVehicle($data);
-        echo json_encode($result);
+    public function getAll(): void {
+        header('Content-Type: application/json');
+        echo json_encode($this->service->getAllVehicles());
     }
 
-    public function getAll() {
-        $result = $this->service->getAllVehicles();
-        echo json_encode($result);
-    }
-
-    public function getById(string $id) {
-        $result = $this->service->getVehicleById($id);
-        if ($result) {
-            echo json_encode($result);
+    public function getById(string $id): void {
+        header('Content-Type: application/json');
+        $vehicle = $this->service->getVehicleById($id);
+        if ($vehicle) {
+            echo json_encode($vehicle);
         } else {
             http_response_code(404);
             echo json_encode(['error' => 'Véhicule non trouvé']);
         }
     }
 
-    public function update(string $id) {
+    public function create(): void {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || !isset($data['type'], $data['marque'], $data['modele'], $data['prix_journalier'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Données manquantes']);
+            return;
+        }
+        $data['kilometrage'] = $data['kilometrage'] ?? 0;
+        $data['disponibilite'] = true;
+        $data['created_at'] = new \MongoDB\BSON\UTCDateTime();
+
+        $id = $this->service->createVehicle($data);
+        echo json_encode(['message' => 'Véhicule ajouté', 'id' => $id]);
+    }
+
+    public function update(string $id): void {
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data) {
             http_response_code(400);
@@ -45,12 +49,22 @@ class VehicleController {
             return;
         }
 
-        $message = $this->service->updateVehicle($id, $data);
-        echo json_encode(['message' => $message]);
+        $success = $this->service->updateVehicle($id, $data);
+        if ($success) {
+            echo json_encode(['message' => 'Véhicule mis à jour']);
+        } else {
+            http_response_code(404);
+            echo json_encode(['error' => 'Véhicule non trouvé ou aucune modification']);
+        }
     }
 
-    public function delete(string $id) {
-        $message = $this->service->deleteVehicle($id);
-        echo json_encode(['message' => $message]);
+    public function delete(string $id): void {
+        $success = $this->service->deleteVehicle($id);
+        if ($success) {
+            echo json_encode(['message' => 'Véhicule supprimé']);
+        } else {
+            http_response_code(404);
+            echo json_encode(['error' => 'Véhicule non trouvé']);
+        }
     }
 }

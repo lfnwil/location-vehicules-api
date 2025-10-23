@@ -4,18 +4,10 @@ namespace Services;
 use Repositories\VehicleRepository;
 
 class VehicleService {
-    private $repository;
+    private VehicleRepository $repository;
 
-    public function __construct($db) {
-        $this->repository = new VehicleRepository($db);
-    }
-
-    public function createVehicle(array $data): array {
-        $insertedId = $this->repository->create($data);
-        return [
-            'message' => 'Véhicule ajouté',
-            'id' => (string)$insertedId
-        ];
+    public function __construct(VehicleRepository $repository) {
+        $this->repository = $repository;
     }
 
     public function getAllVehicles(): array {
@@ -26,13 +18,15 @@ class VehicleService {
         return $this->repository->getById($id);
     }
 
-    public function updateVehicle(string $id, array $data): string {
-        $this->repository->update($id, $data);
-        return "Véhicule mis à jour avec succès";
+    public function createVehicle(array $data): string {
+        return $this->repository->create($data);
     }
 
-    public function deleteVehicle(string $id): string {
-        $this->repository->delete($id);
-        return "Véhicule supprimé avec succès";
+    public function updateVehicle(string $id, array $data): bool {
+        return $this->repository->update($id, $data);
+    }
+
+    public function deleteVehicle(string $id): bool {
+        return $this->repository->delete($id);
     }
 }
