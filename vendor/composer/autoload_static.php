@@ -15,6 +15,11 @@ class ComposerStaticInitc970f1a266f43a2118de462ce989b839
         'S' => 
         array (
             'Symfony\\Polyfill\\Php85\\' => 23,
+            'Services\\' => 9,
+        ),
+        'R' => 
+        array (
+            'Repositories\\' => 13,
         ),
         'P' => 
         array (
@@ -23,10 +28,15 @@ class ComposerStaticInitc970f1a266f43a2118de462ce989b839
         'M' => 
         array (
             'MongoDB\\' => 8,
+            'Models\\' => 7,
         ),
         'F' => 
         array (
             'Firebase\\JWT\\' => 13,
+        ),
+        'C' => 
+        array (
+            'Controllers\\' => 12,
         ),
     );
 
@@ -34,6 +44,14 @@ class ComposerStaticInitc970f1a266f43a2118de462ce989b839
         'Symfony\\Polyfill\\Php85\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php85',
+        ),
+        'Services\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/services',
+        ),
+        'Repositories\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/repositories',
         ),
         'Psr\\Log\\' => 
         array (
@@ -43,9 +61,17 @@ class ComposerStaticInitc970f1a266f43a2118de462ce989b839
         array (
             0 => __DIR__ . '/..' . '/mongodb/mongodb/src',
         ),
+        'Models\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/models',
+        ),
         'Firebase\\JWT\\' => 
         array (
             0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
+        ),
+        'Controllers\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/controllers',
         ),
     );
 

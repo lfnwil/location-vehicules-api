@@ -2,5 +2,13 @@
     "require": {
         "mongodb/mongodb": "^2.1",
         "firebase/php-jwt": "^6.11"
+    },
+    "autoload": {
+    "psr-4": {
+        "Controllers\\": "controllers/",
+        "Services\\": "services/",
+        "Repositories\\": "repositories/",
+        "Models\\": "models/"
     }
+}
 }

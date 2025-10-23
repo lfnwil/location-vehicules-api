@@ -7,7 +7,11 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Symfony\\Polyfill\\Php85\\' => array($vendorDir . '/symfony/polyfill-php85'),
+    'Services\\' => array($baseDir . '/services'),
+    'Repositories\\' => array($baseDir . '/repositories'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
     'MongoDB\\' => array($vendorDir . '/mongodb/mongodb/src'),
+    'Models\\' => array($baseDir . '/models'),
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
+    'Controllers\\' => array($baseDir . '/controllers'),
 );
