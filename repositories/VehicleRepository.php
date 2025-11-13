@@ -17,7 +17,7 @@ class VehicleRepository {
     private function parseId(string $id): ObjectId {
         $id = trim($id);
         if (!preg_match('/^[a-f0-9]{24}$/i', $id)) {
-            throw new InvalidArgumentException("ID invalide pour MongoDB");
+            throw new InvalidArgumentException("ID invalide");
         }
         return new ObjectId($id);
     }

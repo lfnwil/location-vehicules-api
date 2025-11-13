@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: API Location Véhicules
+  version: 1.0.0
+  description: API pour gérer les véhicules
+
+servers:
+  - url: http://localhost:8000
+
+paths:
+  /vehicules:
+    get:
+      summary: Récupère tous les véhicules
+      responses:
+        '200':
+          description: Liste des véhicules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+
+    post:
+      summary: Ajoute un nouveau véhicule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleInput'
+      responses:
+        '201':
+          description: Véhicule ajouté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleResponse'
+
+  /vehicules/{id}:
+    get:
+      summary: Récupère un véhicule par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 68fa2840a72abf6dd00c5b46
+      responses:
+        '200':
+          description: Véhicule trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+
+    put:
+      summary: Met à jour un véhicule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleUpdate'
+      responses:
+        '200':
+          description: Véhicule mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleResponse'
+
+    delete:
+      summary: Supprime un véhicule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Véhicule supprimé
+
+components:
+  schemas:
+    Vehicle:
+      type: object
+      properties:
+        _id:
+          type: string
+        type:
+          type: string
+        marque:
+          type: string
+        modele:
+          type: string
+        kilometrage:
+          type: integer
+        prix_journalier:
+          type: number
+        disponibilite:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    VehicleInput:
+      type: object
+      required:
+        - type
+        - marque
+        - modele
+        - prix_journalier
+      properties:
+        type:
+          type: string
+        marque:
+          type: string
+        modele:
+          type: string
+        kilometrage:
+          type: integer
+        prix_journalier:
+          type: number
+
+    VehicleUpdate:
+      type: object
+      properties:
+        prix_journalier:
+          type: number
+        disponibilite:
+          type: boolean
+
+    VehicleResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        id:
+          type: string
