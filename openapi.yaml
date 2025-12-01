@@ -1,16 +1,19 @@
 openapi: 3.0.3
 info:
-  title: API Location Véhicules
+  title: API de Location de Véhicules
   version: 1.0.0
-  description: API pour gérer les véhicules
-
+  description: >
+    Cette API permet de gérer une flotte de véhicules pour un service de location.  
+    Elle offre des opérations CRUD complètes pour créer, consulter, modifier et supprimer des véhicules.
 servers:
   - url: http://localhost:8000
+    description: Serveur local de développement
 
 paths:
   /vehicules:
     get:
       summary: Récupère tous les véhicules
+      description: Retourne la liste complète des véhicules disponibles dans la base de données.
       responses:
         '200':
           description: Liste des véhicules
@@ -23,6 +26,7 @@ paths:
 
     post:
       summary: Ajoute un nouveau véhicule
+      description: Crée un nouveau véhicule dans la base de données.
       requestBody:
         required: true
         content:
@@ -31,11 +35,13 @@ paths:
               $ref: '#/components/schemas/VehicleInput'
       responses:
         '201':
-          description: Véhicule ajouté
+          description: Véhicule ajouté avec succès
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VehicleResponse'
+        '400':
+          description: Données invalides fournies
 
   /vehicules/{id}:
     get:
@@ -44,6 +50,7 @@ paths:
         - name: id
           in: path
           required: true
+          description: ID du véhicule à récupérer
           schema:
             type: string
             example: 68fa2840a72abf6dd00c5b46
@@ -54,13 +61,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Vehicle'
+        '404':
+          description: Véhicule introuvable
 
     put:
       summary: Met à jour un véhicule
+      description: Permet de modifier le prix ou la disponibilité d’un véhicule.
       parameters:
         - name: id
           in: path
           required: true
+          description: ID du véhicule à mettre à jour
           schema:
             type: string
       requestBody:
@@ -71,11 +82,13 @@ paths:
               $ref: '#/components/schemas/VehicleUpdate'
       responses:
         '200':
-          description: Véhicule mis à jour
+          description: Véhicule mis à jour avec succès
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VehicleResponse'
+        '404':
+          description: Véhicule introuvable
 
     delete:
       summary: Supprime un véhicule
@@ -83,11 +96,14 @@ paths:
         - name: id
           in: path
           required: true
+          description: ID du véhicule à supprimer
           schema:
             type: string
       responses:
         '200':
-          description: Véhicule supprimé
+          description: Véhicule supprimé avec succès
+        '404':
+          description: Véhicule introuvable
 
 components:
   schemas:
@@ -96,21 +112,29 @@ components:
       properties:
         _id:
           type: string
+          example: 68fa2840a72abf6dd00c5b46
         type:
           type: string
+          example: voiture
         marque:
           type: string
+          example: Audi
         modele:
           type: string
+          example: A3
         kilometrage:
           type: integer
+          example: 35000
         prix_journalier:
           type: number
+          example: 65.0
         disponibilite:
           type: boolean
+          example: true
         created_at:
           type: string
           format: date-time
+          example: 2025-10-23T13:06:08Z
 
     VehicleInput:
       type: object
@@ -122,27 +146,36 @@ components:
       properties:
         type:
           type: string
+          example: voiture
         marque:
           type: string
+          example: Peugeot
         modele:
           type: string
+          example: 208
         kilometrage:
           type: integer
+          example: 12000
         prix_journalier:
           type: number
+          example: 50.0
 
     VehicleUpdate:
       type: object
       properties:
         prix_journalier:
           type: number
+          example: 70.0
         disponibilite:
           type: boolean
+          example: false
 
     VehicleResponse:
       type: object
       properties:
         message:
           type: string
+          example: Véhicule ajouté
         id:
           type: string
+          example: 68fa2840a72abf6dd00c5b46
