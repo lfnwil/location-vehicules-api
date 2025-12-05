@@ -16,7 +16,7 @@ class Reservation {
         $this->date_debut = $data['date_debut'] ?? new \MongoDB\BSON\UTCDateTime();
         $this->date_fin = $data['date_fin'] ?? new \MongoDB\BSON\UTCDateTime();
         $this->prix_total = $data['prix_total'] ?? 0;
-        $this->statut = $data['statut'] ?? 'en_cours';
+        $this->statut = $data['statut'] ?? 'en cours'; // confirmé, annulé, en cours, facturé 
         $this->created_at = $data['created_at'] ?? new \MongoDB\BSON\UTCDateTime();
     }
 

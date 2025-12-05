@@ -1,6 +1,8 @@
 <?php
+require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../repositories/ReservationRepository.php';
 require_once __DIR__ . '/../repositories/VehicleRepository.php';
+require_once __DIR__ . '/../repositories/UserRepository.php';
 require_once __DIR__ . '/../services/ReservationService.php';
 require_once __DIR__ . '/../controllers/ReservationController.php';
 
@@ -9,16 +11,18 @@ use Controllers\ReservationController;
 use Services\ReservationService;
 use Repositories\ReservationRepository;
 use Repositories\VehicleRepository;
-
+use Repositories\UserRepository;
 
 function handleReservationRoutes(string $uri, string $method)
 {
     $db = getDatabase();
+
     $reservationRepository = new ReservationRepository($db);
     $vehicleRepository = new VehicleRepository($db);
-    $reservationService = new ReservationService($reservationRepository, $vehicleRepository);
-    $reservationController = new ReservationController($reservationService);
+    $userRepository = new UserRepository($db);
 
+    $reservationService = new ReservationService($reservationRepository, $vehicleRepository, $userRepository);
+    $reservationController = new ReservationController($reservationService);
 
     if ($uri === '/reservations') {
         if ($method === 'GET') {
@@ -49,5 +53,5 @@ function handleReservationRoutes(string $uri, string $method)
     }
 
     http_response_code(404);
-    echo json_encode(["error" => "Endpoint véhicules non trouvé"]);
+    echo json_encode(["error" => "Endpoint reservations non trouvé"]);
 }
