@@ -11,7 +11,7 @@ class UserRepository {
 
     public function __construct(Database $db) {
         $this->db = $db;
-        $this->collection = $this->db->users;
+        $this->collection = $this->db->users; 
     }
 
     private function parseId(string $id): ObjectId {
