@@ -10,16 +10,40 @@ class ReservationController {
         $this->service = $service;
     }
 
+    private function formatReservation(array $res): array {
+        if (isset($res['_id']) && $res['_id'] instanceof \MongoDB\BSON\ObjectId) {
+            $res['_id'] = (string)$res['_id'];
+        }
+        if (isset($res['created_at'])) {
+            $res['created_at'] = $res['created_at']->toDateTime()->format('Y-m-d H:i:s');
+        }
+        if (isset($res['date_debut'])) {
+            $res['date_debut'] = $res['date_debut']->toDateTime()->format('Y-m-d');
+        }
+        if (isset($res['date_fin'])) {
+            $res['date_fin'] = $res['date_fin']->toDateTime()->format('Y-m-d');
+        }
+        return $res;
+    }
+
     public function getAll(): void {
         header('Content-Type: application/json');
-        echo json_encode($this->service->getAllReservations());
+        $reservations = $this->service->getAllReservations();
+
+        $formatted = [];
+        foreach ($reservations as $res) {
+            $res = is_array($res) ? $res : (array)$res;
+            $formatted[] = $this->formatReservation($res);
+        }
+
+        echo json_encode($formatted);
     }
 
     public function getById(string $id): void {
         header('Content-Type: application/json');
-        $reservation = $this->service->getReservationById($id);
-        if ($reservation) {
-            echo json_encode($reservation);
+        $res = $this->service->getReservationById($id);
+        if ($res) {
+            echo json_encode($this->formatReservation((array)$res));
         } else {
             http_response_code(404);
             echo json_encode(['error' => 'Reservation non trouvé']);
@@ -27,8 +51,6 @@ class ReservationController {
     }
 
     public function create(): void {
-        header('Content-Type: application/json');
-
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data || !isset($data['user_id'], $data['vehicle_id'], $data['date_debut'], $data['date_fin'])) {
             http_response_code(400);
@@ -36,17 +58,12 @@ class ReservationController {
             return;
         }
 
-        try {
-            $id = $this->service->createReservation($data);
-            echo json_encode(['message' => 'Réservation ajoutée', 'id' => $id]);
-        } catch (\Exception $e) {
-            http_response_code(400);
-            echo json_encode(['error' => $e->getMessage()]);
-        }
+        $id = $this->service->createReservation($data);
+        $res = $this->service->getReservationById($id);
+        echo json_encode(['message' => 'Reservation ajouté', 'reservation' => $this->formatReservation((array)$res)]);
     }
 
     public function update(string $id): void {
-
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data) {
             http_response_code(400);
@@ -56,7 +73,8 @@ class ReservationController {
 
         $success = $this->service->updateReservation($id, $data);
         if ($success) {
-            echo json_encode(['message' => 'Reservation mis à jour']);
+            $res = $this->service->getReservationById($id);
+            echo json_encode(['message' => 'Reservation mis à jour', 'reservation' => $this->formatReservation((array)$res)]);
         } else {
             http_response_code(404);
             echo json_encode(['error' => 'Reservation non trouvé ou aucune modification']);
@@ -64,7 +82,6 @@ class ReservationController {
     }
 
     public function delete(string $id): void {
-        
         $success = $this->service->deleteReservation($id);
         if ($success) {
             echo json_encode(['message' => 'Reservation supprimé']);
