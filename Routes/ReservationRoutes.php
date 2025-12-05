@@ -1,28 +1,32 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../repositories/ReservationRepository.php';
+require_once __DIR__ . '/../repositories/VehicleRepository.php';
 require_once __DIR__ . '/../services/ReservationService.php';
 require_once __DIR__ . '/../controllers/ReservationController.php';
 
 use function Config\getDatabase;
-use Repositories\ReservationRepository;
-use Services\ReservationService;
 use Controllers\ReservationController;
+use Services\ReservationService;
+use Repositories\ReservationRepository;
+use Repositories\VehicleRepository;
 
-function handleReservationRoutes(string $uri, string $method) {
 
+function handleReservationRoutes(string $uri, string $method)
+{
     $db = getDatabase();
-    $repository = new ReservationRepository($db);
-    $service = new ReservationService($repository);
-    $controller = new ReservationController($service);
+    $reservationRepository = new ReservationRepository($db);
+    $vehicleRepository = new VehicleRepository($db);
+    $reservationService = new ReservationService($reservationRepository, $vehicleRepository);
+    $reservationController = new ReservationController($reservationService);
 
-    if ($uri === "/reservations") {
-        if ($method === "GET") {
-            $controller->getAll();
+
+    if ($uri === '/reservations') {
+        if ($method === 'GET') {
+            $reservationController->getAll();
             return;
         }
-        if ($method === "POST") {
-            $controller->create();
+        if ($method === 'POST') {
+            $reservationController->create();
             return;
         }
     }
@@ -30,16 +34,20 @@ function handleReservationRoutes(string $uri, string $method) {
     if (preg_match('#^/reservations/([a-f0-9]{24})$#', $uri, $matches)) {
         $id = $matches[1];
 
-        if ($method === "GET") {
-            $controller->getById($id);
+        if ($method === 'GET') {
+            $reservationController->getById($id);
             return;
         }
-        if ($method === "DELETE") {
-            $controller->delete($id);
+        if ($method === 'PUT') {
+            $reservationController->update($id);
+            return;
+        }
+        if ($method === 'DELETE') {
+            $reservationController->delete($id);
             return;
         }
     }
 
     http_response_code(404);
-    echo json_encode(["error" => "Route réservations introuvable"]);
+    echo json_encode(["error" => "Endpoint véhicules non trouvé"]);
 }
