@@ -26,6 +26,18 @@ class ReservationController {
         return $res;
     }
 
+     /**
+     * @OA\Get(
+     *     path="/reservations",
+     *     summary="Récupérer toutes les réservations",
+     *     tags={"Réservations"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des réservations",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Reservation"))
+     *     )
+     * )
+     */
     public function getAll(): void {
         header('Content-Type: application/json');
         $reservations = $this->service->getAllReservations();
@@ -37,6 +49,16 @@ class ReservationController {
         echo json_encode($formatted);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/reservations/{id}",
+     *     summary="Récupérer une réservation par ID",
+     *     tags={"Réservations"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="Réservation trouvée", @OA\JsonContent(ref="#/components/schemas/Reservation")),
+     *     @OA\Response(response=404, description="Réservation non trouvée")
+     * )
+     */
     public function getById(string $id): void {
         header('Content-Type: application/json');
         $res = $this->service->getReservationById($id);
@@ -48,6 +70,16 @@ class ReservationController {
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/reservations",
+     *     summary="Créer une réservation",
+     *     tags={"Réservations"},
+     *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/Reservation")),
+     *     @OA\Response(response=200, description="Réservation ajoutée", @OA\JsonContent(ref="#/components/schemas/Reservation")),
+     *     @OA\Response(response=400, description="Données manquantes ou dates invalides")
+     * )
+     */
     public function create(): void {
         header('Content-Type: application/json');
         $data = json_decode(file_get_contents('php://input'), true);
@@ -67,6 +99,18 @@ class ReservationController {
             echo json_encode(['error' => $e->getMessage()]);
         }
     }
+
+    /**
+     * @OA\Put(
+     *     path="/reservations/{id}",
+     *     summary="Mettre à jour une réservation",
+     *     tags={"Réservations"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\RequestBody(@OA\JsonContent(ref="#/components/schemas/Reservation")),
+     *     @OA\Response(response=200, description="Réservation mise à jour", @OA\JsonContent(ref="#/components/schemas/Reservation")),
+     *     @OA\Response(response=404, description="Réservation non trouvée ou aucune modification")
+     * )
+     */
 
     public function update(string $id): void {
         header('Content-Type: application/json');
@@ -93,6 +137,17 @@ class ReservationController {
             echo json_encode(['error' => $e->getMessage()]);
         }
     }
+
+    /**
+     * @OA\Delete(
+     *     path="/reservations/{id}",
+     *     summary="Supprimer une réservation",
+     *     tags={"Réservations"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="Réservation supprimée"),
+     *     @OA\Response(response=404, description="Réservation non trouvée")
+     * )
+     */
 
     public function delete(string $id): void {
         header('Content-Type: application/json');

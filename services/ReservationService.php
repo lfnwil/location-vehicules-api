@@ -42,12 +42,8 @@ class ReservationService {
 
         $existingReservations = $this->reservationRepo->getReservationsByVehicle($data['vehicle_id']);
         foreach ($existingReservations as $res) {
-            $resDebut = $res['date_debut'] instanceof UTCDateTime 
-                ? $res['date_debut']->toDateTime() 
-                : new \DateTime($res['date_debut']);
-            $resFin = $res['date_fin'] instanceof UTCDateTime 
-                ? $res['date_fin']->toDateTime() 
-                : new \DateTime($res['date_fin']);
+            $resDebut = $res['date_debut'] instanceof UTCDateTime ? $res['date_debut']->toDateTime() : new \DateTime($res['date_debut']);
+            $resFin   = $res['date_fin'] instanceof UTCDateTime ? $res['date_fin']->toDateTime() : new \DateTime($res['date_fin']);
             if ($dateDebut <= $resFin && $dateFin >= $resDebut) {
                 throw new \Exception("Le véhicule n'est pas disponible pour ces dates");
             }
@@ -59,35 +55,28 @@ class ReservationService {
         else $statut = 'terminée';
 
         $days = $dateFin->diff($dateDebut)->days + 1;
-        $data['duree_jours']   = $days;
-        $data['prix_total']    = $vehicle['prix_journalier'] * $days;
-        $data['client_name']   = $user['name'];
-        $data['vehicle_name']  = $vehicle['marque'] . ' ' . $vehicle['modele'];
-        $data['date_debut']    = new UTCDateTime($dateDebut->getTimestamp() * 1000);
-        $data['date_fin']      = new UTCDateTime($dateFin->getTimestamp() * 1000);
-        $data['statut']        = $statut;
-        $data['created_at']    = new UTCDateTime();
+        $data['duree_jours']  = $days;
+        $data['prix_total']   = $vehicle['prix_journalier'] * $days;
+        $data['client_name']  = $user['name'];
+        $data['vehicle_name'] = $vehicle['marque'] . ' ' . $vehicle['modele'];
+        $data['date_debut']   = new UTCDateTime($dateDebut->getTimestamp() * 1000);
+        $data['date_fin']     = new UTCDateTime($dateFin->getTimestamp() * 1000);
+        $data['statut']       = $statut;
+        $data['created_at']   = new UTCDateTime();
 
         return $this->reservationRepo->create($data);
     }
 
     public function updateReservation(string $id, array $data): bool {
         $reservation = $this->reservationRepo->getById($id);
-        if (!$reservation) {
-            throw new \Exception("Réservation non trouvée");
-        }
+        if (!$reservation) throw new \Exception("Réservation non trouvée");
 
-        $dateDebut = isset($data['date_debut'])
-            ? new \DateTime($data['date_debut'])
-            : ($reservation['date_debut'] instanceof UTCDateTime ? $reservation['date_debut']->toDateTime() : new \DateTime($reservation['date_debut']));
+        $dateDebut = isset($data['date_debut']) ? new \DateTime($data['date_debut']) :
+                     ($reservation['date_debut'] instanceof UTCDateTime ? $reservation['date_debut']->toDateTime() : new \DateTime($reservation['date_debut']));
+        $dateFin   = isset($data['date_fin']) ? new \DateTime($data['date_fin']) :
+                     ($reservation['date_fin'] instanceof UTCDateTime ? $reservation['date_fin']->toDateTime() : new \DateTime($reservation['date_fin']));
 
-        $dateFin = isset($data['date_fin'])
-            ? new \DateTime($data['date_fin'])
-            : ($reservation['date_fin'] instanceof UTCDateTime ? $reservation['date_fin']->toDateTime() : new \DateTime($reservation['date_fin']));
-
-        if ($dateFin < $dateDebut) {
-            throw new \Exception("La date de fin doit être après la date de début");
-        }
+        if ($dateFin < $dateDebut) throw new \Exception("La date de fin doit être après la date de début");
 
         $existingReservations = $this->reservationRepo->getReservationsByVehicle($reservation['vehicle_id']);
         foreach ($existingReservations as $res) {
@@ -98,21 +87,16 @@ class ReservationService {
                 throw new \Exception("Le véhicule n'est pas disponible pour ces dates");
             }
         }
-
         $data['date_debut'] = new UTCDateTime($dateDebut->getTimestamp() * 1000);
         $data['date_fin']   = new UTCDateTime($dateFin->getTimestamp() * 1000);
 
         $days = $dateFin->diff($dateDebut)->days + 1;
         $data['duree_jours'] = $days;
-
-        if (isset($reservation['vehicle_id'])) {
-            $vehicle = $this->vehicleRepo->getById($reservation['vehicle_id']);
-            $data['prix_total'] = $vehicle['prix_journalier'] * $days;
-        }
+        $vehicle = $this->vehicleRepo->getById($reservation['vehicle_id']);
+        $data['prix_total'] = $vehicle['prix_journalier'] * $days;
 
         return $this->reservationRepo->update($id, $data);
     }
-
 
     public function deleteReservation(string $id): bool {
         return $this->reservationRepo->delete($id);
@@ -135,3 +119,4 @@ class ReservationService {
         return $this->reservationRepo->update($id, ['statut' => $reservation['statut']]);
     }
 }
+-

@@ -20,6 +20,17 @@ class VehicleController {
         return $vehicle;
     }
 
+    /**
+    * @OA\Get(
+    *     path="/vehicules",
+    *     summary="Récupérer tous les véhicules",
+    *     tags={"Véhicules"},
+    *     @OA\Response(response=200, description="Liste des véhicules",
+    *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Vehicle"))
+    *     )
+    * )
+    */
+
     public function getAll(): void {
         header('Content-Type: application/json');
         $vehicles = $this->service->getAllVehicles();
@@ -33,6 +44,17 @@ class VehicleController {
         echo json_encode($formatted);
     }
 
+   /**
+     * @OA\Get(
+     *     path="/vehicules/{id}",
+     *     summary="Récupérer un véhicule par ID",
+     *     tags={"Véhicules"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="Véhicule trouvé", @OA\JsonContent(ref="#/components/schemas/Vehicle")),
+     *     @OA\Response(response=404, description="Véhicule non trouvé")
+     * )
+     */
+
     public function getById(string $id): void {
         header('Content-Type: application/json');
         $vehicle = $this->service->getVehicleById($id);
@@ -43,6 +65,17 @@ class VehicleController {
             echo json_encode(['error' => 'Véhicule non trouvé']);
         }
     }
+
+    /**
+     * @OA\Post(
+     *     path="/vehicules",
+     *     summary="Créer un véhicule",
+     *     tags={"Véhicules"},
+     *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/Vehicle")),
+     *     @OA\Response(response=200, description="Véhicule créé", @OA\JsonContent(ref="#/components/schemas/Vehicle")),
+     *     @OA\Response(response=400, description="Données manquantes")
+     * )
+     */
 
     public function create(): void {
         $data = json_decode(file_get_contents('php://input'), true);
@@ -61,6 +94,17 @@ class VehicleController {
         echo json_encode(['message' => 'Véhicule ajouté', 'vehicle' => $this->formatVehicle((array)$vehicle)]);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/vehicules/{id}",
+     *     summary="Mettre à jour un véhicule",
+     *     tags={"Véhicules"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\RequestBody(@OA\JsonContent(ref="#/components/schemas/Vehicle")),
+     *     @OA\Response(response=200, description="Véhicule mis à jour", @OA\JsonContent(ref="#/components/schemas/Vehicle")),
+     *     @OA\Response(response=404, description="Véhicule non trouvé")
+     * )
+     */
     public function update(string $id): void {
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data) {
@@ -78,6 +122,17 @@ class VehicleController {
             echo json_encode(['error' => 'Véhicule non trouvé ou aucune modification']);
         }
     }
+
+      /**
+     * @OA\Delete(
+     *     path="/vehicules/{id}",
+     *     summary="Supprimer un véhicule",
+     *     tags={"Véhicules"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="Véhicule supprimé"),
+     *     @OA\Response(response=404, description="Véhicule non trouvé")
+     * )
+     */
 
     public function delete(string $id): void {
         $success = $this->service->deleteVehicle($id);

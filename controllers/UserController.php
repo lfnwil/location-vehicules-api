@@ -20,6 +20,19 @@ class UserController {
         return $user;
     }
 
+    /**
+     * @OA\Get(
+     *     path="/users",
+     *     summary="Récupérer tous les utilisateurs",
+     *     tags={"Utilisateurs"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des utilisateurs",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
+     *     )
+     * )
+     */
+
     public function getAll(): void {
         header('Content-Type: application/json');
         $users = $this->service->getAllUsers();
@@ -33,6 +46,16 @@ class UserController {
         echo json_encode($formatted);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/users/{id}",
+     *     summary="Récupérer un utilisateur par ID",
+     *     tags={"Utilisateurs"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="Utilisateur trouvé", @OA\JsonContent(ref="#/components/schemas/User")),
+     *     @OA\Response(response=404, description="Utilisateur non trouvé")
+     * )
+     */
     public function getById(string $id): void {
         header('Content-Type: application/json');
         $user = $this->service->getUserById($id);
@@ -43,6 +66,17 @@ class UserController {
             echo json_encode(['error' => 'User non trouvé']);
         }
     }
+
+    /**
+     * @OA\Post(
+     *     path="/users",
+     *     summary="Créer un utilisateur",
+     *     tags={"Utilisateurs"},
+     *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/User")),
+     *     @OA\Response(response=200, description="Utilisateur créé", @OA\JsonContent(ref="#/components/schemas/User")),
+     *     @OA\Response(response=400, description="Champs obligatoires manquants")
+     * )
+     */
 
     public function create(): void {
         header('Content-Type: application/json');
@@ -62,6 +96,18 @@ class UserController {
         $user = $this->service->getUserById($id);
         echo json_encode(['message' => 'User créé', 'user' => $this->formatUser((array)$user)]);
     }
+
+      /**
+     * @OA\Put(
+     *     path="/users/{id}",
+     *     summary="Mettre à jour un utilisateur",
+     *     tags={"Utilisateurs"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\RequestBody(@OA\JsonContent(ref="#/components/schemas/User")),
+     *     @OA\Response(response=200, description="Utilisateur mis à jour", @OA\JsonContent(ref="#/components/schemas/User")),
+     *     @OA\Response(response=404, description="Utilisateur non trouvé")
+     * )
+     */
 
     public function update(string $id): void {
         header('Content-Type: application/json');
@@ -86,6 +132,17 @@ class UserController {
             echo json_encode(['error' => 'User non trouvé']);
         }
     }
+
+     /**
+     * @OA\Delete(
+     *     path="/users/{id}",
+     *     summary="Supprimer un utilisateur",
+     *     tags={"Utilisateurs"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="Utilisateur supprimé"),
+     *     @OA\Response(response=404, description="Utilisateur non trouvé")
+     * )
+     */
 
     public function delete(string $id): void {
         header('Content-Type: application/json');
