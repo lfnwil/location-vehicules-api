@@ -4,33 +4,29 @@ namespace Services;
 use Repositories\UserRepository;
 
 class UserService {
-    private UserRepository $repo;
+    private UserRepository $repository;
 
-    public function __construct(UserRepository $repo) {
-        $this->repo = $repo;
+    public function __construct(UserRepository $repository) {
+        $this->repository = $repository;
     }
 
-    public function createUser(array $data) {
-        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-        return $this->repo->create($data);
+    public function getAllUsers(): array {
+        return $this->repository->getAll();
     }
 
-    public function getAllUsers() {
-        return $this->repo->getAll();
+    public function getUserById(string $id): ?array {
+        return $this->repository->getById($id);
     }
 
-    public function getUserById(string $id) {
-        return $this->repo->getById($id);
+    public function createUser(array $data): string {
+        return $this->repository->create($data);
     }
 
-    public function updateUser(string $id, array $data) {
-        if(isset($data['password'])){
-            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-        }
-        $this->repo->update($id, $data);
+    public function updateUser(string $id, array $data): bool {
+        return $this->repository->update($id, $data);
     }
 
-    public function deleteUser(string $id) {
-        $this->repo->delete($id);
+    public function deleteUser(string $id): bool {
+        return $this->repository->delete($id);
     }
 }

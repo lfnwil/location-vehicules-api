@@ -16,6 +16,7 @@ function handleVehicleRoutes(string $uri, string $method)
     $vehicleService = new VehicleService($vehicleRepository);
     $vehicleController = new VehicleController($vehicleService);
 
+    // /vehicules
     if ($uri === '/vehicules') {
         if ($method === 'GET') {
             $vehicleController->getAll();
@@ -27,6 +28,7 @@ function handleVehicleRoutes(string $uri, string $method)
         }
     }
 
+    // /Vehicules/{id}
     if (preg_match('#^/vehicules/([a-f0-9]{24})$#', $uri, $matches)) {
         $id = $matches[1];
 

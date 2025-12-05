@@ -16,6 +16,7 @@ function handleUserRoutes(string $uri, string $method)
     $userService = new UserService($userRepository);
     $userController = new UserController($userService);
 
+    // /users
     if ($uri === '/users') {
         if ($method === 'GET') {
             $userController->getAll();
@@ -26,7 +27,8 @@ function handleUserRoutes(string $uri, string $method)
             return;
         }
     }
-    
+
+    // /users/{id}
     if (preg_match('#^/users/([a-f0-9]{24})$#', $uri, $matches)) {
         $id = $matches[1];
 

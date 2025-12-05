@@ -3,47 +3,79 @@ namespace Repositories;
 
 use MongoDB\Database;
 use MongoDB\BSON\ObjectId;
-use Models\Reservation;
 
 class ReservationRepository {
-    private Database $db;
+    
+    private $collection;
+    private $collectionVehicles;
+    private $collectionUsers;
 
     public function __construct(Database $db) {
-        $this->db = $db;
+        $this->collection = $db->reservations;
+        $this->collectionVehicles = $db->vehicles;
+        $this->collectionUsers = $db->users;
     }
 
-    private function parseId(string $id): ObjectId {
-        try {
-            return new ObjectId(trim($id));
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException("ID invalide pour MongoDB");
+    public function getAll() {
+        return $this->collection->find()->toArray();
+    }
+
+    public function getById(string $id) {
+        return $this->collection->findOne(["_id" => new ObjectId($id)]);
+    }
+
+    public function createReservation(array $data) {
+
+        $vehicle = $this->collectionVehicles->findOne([
+            "_id" => new ObjectId($data["vehicule_id"])
+        ]);
+
+        if (!$vehicle) {
+            return ["error" => "Véhicule introuvable"];
         }
+
+        $user = $this->collectionUsers->findOne([
+            "_id" => new ObjectId($data["user_id"])
+        ]);
+
+        if (!$user) {
+            return ["error" => "User introuvable"];
+        }
+
+        $dateDebut = new \DateTime($data["date_debut"]);
+        $dateFin   = new \DateTime($data["date_fin"]);
+        $diff = $dateDebut->diff($dateFin)->days;
+
+        if ($diff <= 0) {
+            return ["error" => "La date de fin doit être supérieure à la date de début"];
+        }
+
+        $prixJournalier = $vehicle->prix_journalier;
+        $prixTotal = $diff * $prixJournalier;
+
+        $reservation = [
+            "vehicule_id" => new ObjectId($data["vehicule_id"]),
+            "user_id" => new ObjectId($data["user_id"]),
+            "date_debut" => $data["date_debut"],
+            "date_fin" => $data["date_fin"],
+            "prix_total" => $prixTotal,
+            "created_at" => new \MongoDB\BSON\UTCDateTime()
+        ];
+
+        $result = $this->collection->insertOne($reservation);
+
+        return [
+            "message" => "Réservation créée",
+            "id" => (string)$result->getInsertedId(),
+            "prix_total" => $prixTotal
+        ];
     }
 
-    public function create(array $data): string {
-        $result = $this->db->reservations->insertOne($data);
-        return (string)$result->getInsertedId();
-    }
+    public function delete(string $id) {
+        $result = $this->collection->deleteOne([
+            "_id" => new ObjectId($id)
+        ]);
 
-    public function findAll(): array {
-        return $this->db->reservations->find()->toArray();
-    }
-
-    public function getById(string $id): ?array {
-        $objId = $this->parseId($id);
-        $reservation = $this->db->reservations->findOne(['_id' => $objId]);
-        return $reservation ? (array)$reservation : null;
-    }
-
-    public function update(string $id, array $data): bool {
-        $objId = $this->parseId($id);
-        $result = $this->db->reservations->updateOne(['_id' => $objId], ['$set' => $data]);
-        return $result->getModifiedCount() > 0;
-    }
-
-    public function delete(string $id): bool {
-        $objId = $this->parseId($id);
-        $result = $this->db->reservations->deleteOne(['_id' => $objId]);
         return $result->getDeletedCount() > 0;
     }
 }

@@ -27,6 +27,7 @@ class VehicleController {
     }
 
     public function create(): void {
+
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data || !isset($data['type'], $data['marque'], $data['modele'], $data['prix_journalier'])) {
             http_response_code(400);
@@ -42,6 +43,7 @@ class VehicleController {
     }
 
     public function update(string $id): void {
+
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data) {
             http_response_code(400);
@@ -59,6 +61,7 @@ class VehicleController {
     }
 
     public function delete(string $id): void {
+        
         $success = $this->service->deleteVehicle($id);
         if ($success) {
             echo json_encode(['message' => 'Véhicule supprimé']);
